@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const userSchema =new mongoose.Schema({
+const userSchema = new mongoose.Schema({
   email: {
     type: String,
     required: [true, "Email is required for creating a user"],
@@ -20,26 +20,27 @@ const userSchema =new mongoose.Schema({
   password: {
     type: String,
     required: [true, "Password is required for creating a account"],
-    minlength:[6,'Password should be contain 6 Character']
-    ,select:false
+    minlength: [6, "Password should be contain 6 Character"],
+    select: false,
   },
-  Timestamp:true
+},
+{Timestamp: true},
+
+);
+
+userSchema.pre("save", async function (next) {
+  if (!this.isModified("password")) {
+    return next();
+  }
+  const hash = await bcrypt.hash(this.password, 10);
+  this.password = hash;
+  return next();
 });
 
+userSchema.methods.comparePassword = async function (password) {
+  return await bcrypt.compare(password, this.password);
+};
 
-userSchema.pre('save', async function(next){
-if (!this.isModified('password')) {
-  return next()
-}
-const hash= await bcrypt.hash(this.password,10)
-this.password=hash
-return next()
-})
+const userModel = mongoose.model("user", userSchema);
 
-userSchema.methods.comparePassword = async function (password){
-  return await bcrypt.compare(password,this.password)
-}
-
-const userModel=mongoose.model('user',userSchema)
-
-module.exports=userModel
+module.exports = userModel;
