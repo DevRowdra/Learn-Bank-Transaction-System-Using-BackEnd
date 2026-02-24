@@ -9,12 +9,13 @@ app.use(cookieParser());
 app.use(express.json())
 
 // ** Global error handling middleware
-app.use(globalErrorHandler)
 
 app.get("/test", (req, res) => {
   res.json("server is runing");
   console.log("text");
 });
 
-app.use("/api/auth", authRouter);
+app.use("/api/v1/auth", authRouter);
+
+app.use(globalErrorHandler)
 module.exports = app;

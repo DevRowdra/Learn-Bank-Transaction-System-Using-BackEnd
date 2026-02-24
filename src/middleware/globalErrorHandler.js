@@ -1,13 +1,11 @@
-const globalErrorHandler = (err, req, res, next) => {
-    const statusCode = err.statusCode || 500;
-//   console.log(err);
 
-  res.status(statusCode).json({
-    success: false,
-    statusCode,
-    message: err.message || "Internal Server Error",
-    data: null,
-  });
+const sendResponse = require("../utils/response");
+
+const globalErrorHandler = (err, req, res, next) => {
+  const statusCode = err.statusCode || 500;
+  const message = err.message || "Internal Server Error";
+
+  return sendResponse(res, statusCode, message, null);
 };
 
 module.exports = globalErrorHandler;
