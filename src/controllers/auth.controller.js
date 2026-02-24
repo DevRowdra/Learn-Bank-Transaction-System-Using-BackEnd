@@ -30,7 +30,7 @@ async function userRegisterController(req, res) {
       userId: user._id,
     },
     process.env.JWT_SECRET,
-    { expiresIn: "1h" },
+    { expiresIn: "24h" },
   );
 
   // res.cookie("token", token, )
@@ -40,23 +40,77 @@ async function userRegisterController(req, res) {
     sameSite: "strict",
     maxAge: 60 * 60 * 1000,
   });
-  return sendResponse(res, 201, "User registered successfully", {
-    _id: user._id,
-    name: user.name,
-    email: user.email,
-  });
+  return sendResponse(
+    res,
+    201,
+    "User registered successfully",
+    {
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+    },
+    token,
+  );
 }
 
 // ** @desc User Login Controller
 // ** @route POST /api/v1/auth/login
 // ** @access Public
 
-const userLoginController=asyncHandler(async(req,res)=>{
-  
+const userLoginController = asyncHandler(async (req, res) => {
+  const { email, password } = req.body;
+  console.log(email, password);
 
-})
+  if (!email || !password) {
+    throw new AppError("All fields are required to login User", 400);
+  }
 
+  const user = await userModel.findOne({ email }).select("+password");
+
+  if (!user) {
+    throw new AppError("Invalid credentials", 401);
+  }
+
+  const isValidPassword = await user.comparePassword(password);
+  if (!isValidPassword) {
+    throw new AppError("Invalid Password", 401);
+  }
+
+  const token = jwt.sign(
+    {
+      userId: user._id,
+    },
+    process.env.JWT_SECRET,
+    { expiresIn: "24h" },
+  );
+
+  // res.cookie("token", token, )
+  res.cookie("token", token, {
+    httpOnly: true,
+    secure: false,
+    sameSite: "strict",
+    maxAge: 60 * 60 * 1000,
+  });
+  return sendResponse(
+    res,
+    201,
+    "User Login successfully",
+    {
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+    },
+    {token},
+  );
+  // console.log(isValidPassword);
+  // return sendResponse(res, 200, "User login successfully", {
+  //   _id: user._id,
+  //   name: user.name,
+  //   email: user.email,
+  // });
+});
 
 module.exports = {
   userRegisterController,
+  userLoginController,
 };
