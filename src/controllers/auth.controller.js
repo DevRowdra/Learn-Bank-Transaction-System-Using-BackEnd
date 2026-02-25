@@ -40,7 +40,7 @@ async function userRegisterController(req, res) {
     sameSite: "strict",
     maxAge: 60 * 60 * 1000,
   });
-   sendResponse(
+  sendResponse(
     res,
     201,
     "User registered successfully",
@@ -49,10 +49,9 @@ async function userRegisterController(req, res) {
       name: user.name,
       email: user.email,
     },
-    {token},
-  )
-  console.log('send')
-await emailService.sendRegistrationEmail(user.email,user.name);
+    { token },
+  );
+  await emailService.sendRegistrationEmail(user.email, user.name);
 }
 
 // ** @desc User Login Controller
@@ -93,7 +92,7 @@ const userLoginController = asyncHandler(async (req, res) => {
     sameSite: "strict",
     maxAge: 60 * 60 * 1000,
   });
-  return sendResponse(
+  sendResponse(
     res,
     201,
     "User Login successfully",
@@ -102,14 +101,13 @@ const userLoginController = asyncHandler(async (req, res) => {
       name: user.name,
       email: user.email,
     },
-    {token},
+    { token },
   );
-  // console.log(isValidPassword);
-  // return sendResponse(res, 200, "User login successfully", {
-  //   _id: user._id,
-  //   name: user.name,
-  //   email: user.email,
-  // });
+  await emailService.sendLoginEmail(user.email, user.name, {
+    ipAddress: req.ip,
+    device: req.headers["user-agent"],
+  });
+  clg("Login email sent");
 });
 
 module.exports = {
