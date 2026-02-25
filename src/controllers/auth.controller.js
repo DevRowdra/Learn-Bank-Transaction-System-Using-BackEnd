@@ -4,7 +4,7 @@ const jwt = require("jsonwebtoken");
 const sendResponse = require("../utils/response");
 const AppError = require("../utils/AppError");
 const asyncHandler = require("../utils/asyncHandler");
-
+const emailService = require("../services/email.service");
 async function userRegisterController(req, res) {
   const { name, email, password } = req.body;
   // 1️⃣ Validate input
@@ -40,7 +40,7 @@ async function userRegisterController(req, res) {
     sameSite: "strict",
     maxAge: 60 * 60 * 1000,
   });
-  return sendResponse(
+   sendResponse(
     res,
     201,
     "User registered successfully",
@@ -49,8 +49,10 @@ async function userRegisterController(req, res) {
       name: user.name,
       email: user.email,
     },
-    token,
-  );
+    {token},
+  )
+  console.log('send')
+await emailService.sendRegistrationEmail(user.email,user.name);
 }
 
 // ** @desc User Login Controller
