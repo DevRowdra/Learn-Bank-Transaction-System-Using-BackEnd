@@ -14,16 +14,6 @@ const accountRouter = require("./router/account.router");
 // * User routes
 
 
-// ** Global error handling middleware
-
-app.get("/test", (req, res) => {
-  res.json("server is runing");
-  console.log("text");
-});
-
-
-
-
 app.use("/api/v1/accounts",accountRouter);
 app.use("/api/v1/auth", authRouter);
 
