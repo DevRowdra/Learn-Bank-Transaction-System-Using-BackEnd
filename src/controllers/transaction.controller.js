@@ -3,7 +3,7 @@ const asyncHandler = require("../utils/asyncHandler");
 const accountmodel = require("../models/account.model");
 const accountModel = require("../models/account.model");
 const sendResponse = require("../utils/response");
-
+const mongoose = require("mongoose");
 const createTransaction = asyncHandler(async (req, res) => {
   const { fromAccount, toAccount, amount, idempotencyKey } = req.body;
 
@@ -16,13 +16,13 @@ const createTransaction = asyncHandler(async (req, res) => {
     );
   }
 
-  const fromAccoutn = await accountModel.findOne({
+  const fromUserAccount = await accountModel.findOne({
     _id: fromAccount,
   });
-  const toAccoutn = await accountModel.findOne({
+  const toUserAccount = await accountModel.findOne({
     _id: toAccount,
   });
-  if (!fromAccoutn || !toAccoutn) {
+  if (!fromUserAccount || !toUserAccount) {
     throw new AppError("Invalid fromAccount or toAccount", 400);
   }
 
@@ -69,11 +69,18 @@ const createTransaction = asyncHandler(async (req, res) => {
     return handler();
   }
   // * 3️⃣ Check account status
-  if (fromAccoutn.status !== "ACTIVE" || toAccoutn.status !== "ACTIVE") {
+  if (fromUserAccount.status !== "ACTIVE" || toUserAccount.status !== "ACTIVE") {
     throw new AppError(
       "Both accounts must be active to perform a transaction",
       400,
     );
   }
+  // * 4️⃣ Driven sender balance form leger
+  const balance = await fromUserAccount.getBalance();
+  if (balance < amount) {
+    throw new AppError(`Insufficient balance in sender's account. Current balance is this ${balance}. Requested  ammount is ${amount}`, 400);
+  }
+  // * 5️⃣ Create transaction with PENDING status
+  const session= await mongoose.startSession()
   
 });
