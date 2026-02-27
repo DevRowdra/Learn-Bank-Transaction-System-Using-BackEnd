@@ -36,12 +36,14 @@ function prventLedgerModification() {
   throw new Error("Ledger entries cannot be modified or deleted");
 }
 
-ledgerSchema.pre('findOneAndUpdate', prventLedgerModification);
-ledgerSchema.pre('updateOne', prventLedgerModification);
-ledgerSchema.pre('deleteOne', prventLedgerModification);
-ledgerSchema.pre('deleteMany', prventLedgerModification);
-ledgerSchema.pre('updateMany', prventLedgerModification);
-ledgerSchema.pre('remove', prventLedgerModification);
+ledgerSchema.pre("findOneAndUpdate", prventLedgerModification);
+ledgerSchema.pre("findOneAndDelete", prventLedgerModification);
+ledgerSchema.pre("updateOne", prventLedgerModification);
+ledgerSchema.pre("deleteOne", prventLedgerModification);
+ledgerSchema.pre("deleteMany", prventLedgerModification);
+ledgerSchema.pre("updateMany", prventLedgerModification);
+ledgerSchema.pre("remove", prventLedgerModification);
+ledgerSchema.pre("findOneAndReplace", prventLedgerModification);
 
 const ledgerModel = mongoose.model("ledger", ledgerSchema);
 module.exports = ledgerModel;
