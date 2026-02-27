@@ -2,10 +2,13 @@ const express = require("express");
 const app = express();
 const cookieParser = require("cookie-parser");
 const globalErrorHandler = require("./middleware/globalErrorHandler.middleware.js");
+const { apiRateLimite } = require("./middleware/rateLimiter.js");
+
 
 app.use(cookieParser());
 app.use(express.json())
-
+// * Apply rate limiting to all requests
+app.use(apiRateLimite);
 
 // ** Routes
 const authRouter = require("./router/auth.router");

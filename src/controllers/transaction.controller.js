@@ -26,7 +26,6 @@ const createTransaction = asyncHandler(async (req, res) => {
     throw new AppError("Invalid fromAccount or toAccount", 400);
   }
 
-
   // * 2️⃣ Check if transaction with the same idempotency key already exists
 
   const isTransactionAlreadyExists = await transactionModel.findOne({
@@ -71,7 +70,10 @@ const createTransaction = asyncHandler(async (req, res) => {
   }
   // * 3️⃣ Check account status
   if (fromAccoutn.status !== "ACTIVE" || toAccoutn.status !== "ACTIVE") {
-    throw new AppError("Both accounts must be active to perform a transaction", 400);
+    throw new AppError(
+      "Both accounts must be active to perform a transaction",
+      400,
+    );
   }
   
 });
