@@ -117,8 +117,67 @@ Bank BackEnd Team
 
   await sendEmail(userEmail, subject, text, html);
 });
+const sendTransactionEmail = asyncHandler(
+  async (userEmail, name, amount, toAccount, transactionDetails = {}) => {
+    const {
+      transactionId = "N/A",
+      date = new Date().toLocaleString(),
+    } = transactionDetails;
 
+    const subject = "💸 Transaction Successful - Bank BackEnd Project";
+
+    const text = `
+Hello ${name},
+
+Your transaction has been successfully completed.
+
+Transaction Details:
+Amount: ${amount}
+To Account: ${toAccount}
+Transaction ID: ${transactionId}
+Date: ${date}
+
+If this was not you, please contact support immediately.
+
+Regards,
+Bank BackEnd Team
+`;
+
+    const html = `
+    <div style="font-family: Arial, sans-serif; background-color: #f4f6f8; padding: 20px;">
+      <div style="max-width: 600px; margin: auto; background: #ffffff; border-radius: 10px; padding: 30px; box-shadow: 0 5px 15px rgba(0,0,0,0.08);">
+        
+        <h2 style="color: #16a34a; text-align: center;">💸 Transaction Successful</h2>
+
+        <p>Hello <strong>${name}</strong>,</p>
+
+        <p>Your transfer has been successfully completed.</p>
+
+        <div style="background-color: #f1f5f9; padding: 15px; border-radius: 8px; margin: 20px 0;">
+          <p><strong>💰 Amount:</strong> ${amount}</p>
+          <p><strong>🏦 To Account:</strong> ${toAccount}</p>
+          <p><strong>🧾 Transaction ID:</strong> ${transactionId}</p>
+          <p><strong>🕒 Date:</strong> ${date}</p>
+        </div>
+
+        <p style="font-size: 14px; color: #555;">
+          If you did not authorize this transaction, please contact support immediately.
+        </p>
+
+        <hr style="margin: 25px 0;" />
+
+        <p style="font-size: 12px; color: #999; text-align: center;">
+          © ${new Date().getFullYear()} Bank BackEnd Project
+        </p>
+      </div>
+    </div>
+    `;
+
+    await sendEmail(userEmail, subject, text, html);
+  }
+);
 module.exports = {
   sendRegistrationEmail,
   sendLoginEmail,
+  sendTransactionEmail
 };
