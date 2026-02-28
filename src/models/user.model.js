@@ -1,40 +1,46 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
-const userSchema = new mongoose.Schema({
-  email: {
-    type: String,
-    required: [true, "Email is required for creating a user"],
-    trim: true,
-    lowercase: true,
-    match: [
-      /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
-      "Invalid email address.",
-    ],
-    unique: [true, "email already exists"],
+const userSchema = new mongoose.Schema(
+  {
+    email: {
+      type: String,
+      required: [true, "Email is required for creating a user"],
+      trim: true,
+      lowercase: true,
+      match: [
+        /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+        "Invalid email address.",
+      ],
+      unique: [true, "email already exists"],
+    },
+    name: {
+      type: String,
+      required: [true, "name is requird for user "],
+      trim: true,
+    },
+    password: {
+      type: String,
+      required: [true, "Password is required for creating a account"],
+      minlength: [6, "Password should be contain 6 Character"],
+      select: false,
+    },
+    stystamUser: {
+      type: Boolean,
+      default: false,
+      immutable: true,
+      select: false,
+    },
   },
-  name: {
-    type: String,
-    required: [true, "name is requird for user "],
-    trim: true,
-  },
-  password: {
-    type: String,
-    required: [true, "Password is required for creating a account"],
-    minlength: [6, "Password should be contain 6 Character"],
-    select: false,
-  },
-},
-{Timestamp: true},
-
+  { timestamps: true },
 );
 
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) {
-    return ;
+    return;
   }
   const hash = await bcrypt.hash(this.password, 10);
   this.password = hash;
-  return ;
+  return;
 });
 
 userSchema.methods.comparePassword = async function (password) {
